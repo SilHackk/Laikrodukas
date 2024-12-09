@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="lt">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Išmanus laikrodis</title>
+        <style>
+            body {
+                font-family: 'Arial', sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #1a1a1a;
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+
+            .watch {
+                width: 250px;
+                height: 350px;
+                background: #333;
+                border-radius: 20px;
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20px;
+                position: relative;
+            }
+
+            #time {
+                font-size: 2.5rem;
+                font-weight: bold;
+                margin: 0;
+            }
+
+            #date {
+                font-size: 1rem;
+                color: #aaa;
+            }
+
+            .icons {
+                display: flex;
+                justify-content: space-around;
+                width: 100%;
+            }
+
+            .icon {
+                width: 50px;
+                height: 50px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: transform 0.2s ease, background 0.3s ease;
+            }
+
+            .icon img {
+                width: 70%;
+                height: 70%;
+            }
+
+            .icon:hover {
+                transform: scale(1.1);
+                background: rgba(255, 255, 255, 0.2);
+            }
+
+            .heart-rate {
+                background: rgba(255, 0, 0, 0.1);
+                color: red;
+                font-size: 1rem;
+                padding: 10px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+            }
+
+            .heart-rate i {
+                margin-right: 5px;
+            }
+
+            .overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.9);
+                display: none;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                border-radius: 20px;
+                z-index: 10;
+            }
+
+            .spotify-content {
+                text-align: center;
+                color: white;
+                padding: 10px;
+            }
+
+            .spotify-song {
+                margin: 5px 0;
+                font-size: 1.2rem;
+                font-weight: bold;
+            }
+
+            .spotify-controls button {
+                background: #1db954;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                cursor: pointer;
+                border-radius: 5px;
+                margin: 5px;
+            }
+
+            .spotify-controls button:hover {
+                background: #17a74a;
+            }
+
+            #closeOverlay {
+                background: #555;
+                color: white;
+                border: none;
+                padding: 10px;
+                font-size: 0.9rem;
+                cursor: pointer;
+                border-radius: 5px;
+                margin-top: 10px;
+            }
+
+            #closeOverlay:hover {
+                background: #777;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="watch">
+            <div id="time">00:00:00</div>
+            <div id="date">YYYY-MM-DD</div>
+
+            <div class="icons">
+                <div class="icon" data-action="spotify"><img src="images/spotify.jpg" alt="Spotify Icon"></div>
+                <div class="icon" data-action="contacts"><img src="images/1100768.png" alt="Contacts Icon"></div>
+                <div class="icon" data-action="weather"><img src="images/Weather.png" alt="Weather Icon"></div>
+            </div>
+
+            <div class="heart-rate">
+                <i class="fa fa-heartbeat"></i>
+                <span>72 bpm</span>
+            </div>
+
+            <!-- Overlay sluoksnis -->
+            <div class="overlay" id="overlay">
+                <div class="spotify-content" id="overlayContent">
+                    <!-- Dinamiškai įterpiamas turinys -->
+                </div>
+                <button id="closeOverlay">Grįžti</button>
+            </div>
+        </div>
+
+        <script>
+            function formatTime(date) {
+                let hours = date.getHours().toString().padStart(2, '0');
+                let minutes = date.getMinutes().toString().padStart(2, '0');
+                let seconds = date.getSeconds().toString().padStart(2, '0');
+                return `${hours}:${minutes}:${seconds}`;
+            }
+
+            function formatDate(date) {
+                let year = date.getFullYear();
+                let month = (date.getMonth() + 1).toString().padStart(2, '0');
+                let day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            function updateClock() {
+                const now = new Date();
+                document.getElementById('time').textContent = formatTime(now);
+                document.getElementById('date').textContent = formatDate(now);
+            }
+
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            const overlay = document.getElementById('overlay');
+            const overlayContent = document.getElementById('overlayContent');
+            const closeOverlay = document.getElementById('closeOverlay');
+
+            document.querySelectorAll('.icon').forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const action = icon.getAttribute('data-action');
+
+                    if (action === "spotify") {
+                        overlayContent.innerHTML = `
+                            <h2>Spotify</h2>
+                            <p class="spotify-song">Daina: Imagine - John Lennon</p>
+                            <div class="spotify-controls">
+                                <button>⏮ Ankstesnė</button>
+                                <button>⏯ Pauzė</button>
+                                <button>⏭ Kita</button>
+                            </div>
+                        `;
+                    } else if (action === "contacts") {
+                        overlayContent.innerHTML = `
+                            <h2>Kontaktai</h2>
+                            <ul class="contact-list">
+                                <li>Jonas: +370 600 12345</li>
+                                <li>Marytė: +370 612 34567</li>
+                                <li>Petras: +370 698 98765</li>
+                            </ul>
+                        `;
+                    } else if (action === "weather") {
+                        overlayContent.innerHTML = `
+                            <h2>Orai Vilniuje</h2>
+                            <p>Temperatūra: 20°C, Saulėta</p>
+                        `;
+                    }
+
+                    overlay.style.display = 'flex';
+                });
+            });
+
+            closeOverlay.addEventListener('click', () => {
+                overlay.style.display = 'none';
+            });
+        </script>
+    </body>
+</html>
